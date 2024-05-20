@@ -32,6 +32,7 @@ function create() {
   this.add.image(400, 300, "background");
 
   player = this.physics.add.sprite(400, 300, "player");
+  player.setScale(0.2);
 
   this.cursors = this.input.keyboard.createCursorKeys();
 }

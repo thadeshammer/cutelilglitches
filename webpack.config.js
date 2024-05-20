@@ -26,4 +26,12 @@ module.exports = {
       phaser: path.resolve(__dirname, "node_modules/phaser/dist/phaser.js"),
     },
   },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "public"),
+    },
+    compress: true,
+    port: 4000,
+    open: true,
+  },
 };
