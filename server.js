@@ -1,54 +1,16 @@
-// server.js
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
 const path = require("path");
+const app = express();
+const port = 3000;
 
-const port = 7777;
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "public")));
 
-const server = http.createServer((req, res) => {
-  const filePath = path.join(
-    __dirname,
-    req.url === "/" ? "index.html" : req.url
-  );
-  const extname = path.extname(filePath);
-  let contentType = "text/html";
-
-  switch (extname) {
-    case ".js":
-      contentType = "application/javascript";
-      break;
-    case ".css":
-      contentType = "text/css";
-      break;
-    case ".json":
-      contentType = "application/json";
-      break;
-    case ".png":
-      contentType = "image/png";
-      break;
-    case ".jpg":
-      contentType = "image/jpg";
-      break;
-  }
-
-  fs.readFile(filePath, (error, content) => {
-    if (error) {
-      if (error.code === "ENOENT") {
-        fs.readFile(path.join(__dirname, "404.html"), (err, page) => {
-          res.writeHead(404, { "Content-Type": "text/html" });
-          res.end(page, "utf-8");
-        });
-      } else {
-        res.writeHead(500);
-        res.end(`Server Error: ${error.code}`);
-      }
-    } else {
-      res.writeHead(200, { "Content-Type": contentType });
-      res.end(content, "utf-8");
-    }
-  });
+// Send the main HTML file when accessing the root URL
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
