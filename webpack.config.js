@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  mode: "development",
+  mode: process.env.NODE_ENV || "development",
   entry: "./public/index.js",
   output: {
     filename: "bundle.js",
@@ -31,7 +31,7 @@ module.exports = {
       directory: path.join(__dirname, "public"),
     },
     compress: true,
-    port: 4000,
+    port: 3000,
     open: true,
   },
 };
