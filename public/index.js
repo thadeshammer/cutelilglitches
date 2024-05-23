@@ -24,13 +24,10 @@ let player;
 const speed = 160;
 
 function preload() {
-  this.load.image("background", "assets/background.png"); // Corrected background path
   this.load.image("player", "assets/sprite.png"); // Corrected sprite path
 }
 
 function create() {
-  this.add.image(400, 300, "background");
-
   player = this.physics.add.sprite(400, 300, "player");
   player.setScale(0.2);
 
