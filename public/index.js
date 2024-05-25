@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
 /**
- * @type {Phaser.config}
+ * @type {Phaser.Types.Core.GameConfig}
  */
 const config = {
   type: Phaser.AUTO,
