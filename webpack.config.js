@@ -32,6 +32,6 @@ module.exports = {
     },
     compress: true,
     port: 3000,
-    open: true,
+    open: false, // Let's not open a browser tab
   },
 };
