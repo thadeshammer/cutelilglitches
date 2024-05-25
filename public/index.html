@@ -6,14 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shh</title>
     <style>
+      html,
       body {
         margin: 0;
         padding: 0;
+        overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         background: transparent;
+      }
+      #gameContainer {
+        width: 100%;
+        height: 100%;
       }
       canvas {
         display: block;
@@ -24,6 +31,7 @@
     </style>
   </head>
   <body>
+    <div id=""gameContainer"></div>
     <script src="http://localhost:3000/bundle.js"></script>
   </body>
 </html>

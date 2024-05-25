@@ -5,8 +5,8 @@ import Phaser from "phaser";
  */
 const config = {
   type: Phaser.AUTO,
-  width: 1920,
-  height: 1080,
+  width: window.innerWidth,
+  height: window.innerHeight,
   physics: {
     default: "arcade",
     arcade: {
@@ -28,11 +28,19 @@ const config = {
   },
   backgroundColor: "rgba(0,0,0,0)",
   transparent: true,
+  fps: {
+    target: 30,
+    forceSetTimeOut: true,
+  },
 };
 
 const game = new Phaser.Game(config);
 
 let flowers = [];
+
+window.addEventListener("resize", () => {
+  game.scale.resize(window.innerWidth, window.innerHeight);
+});
 
 function preload() {
   this.load.image("flower", "assets/flower_v1_transparency.png");
@@ -61,9 +69,15 @@ function create() {
 }
 
 function update() {
+  const screenWidth = this.sys.game.config.width;
+
   flowers.forEach((sprite) => {
-    if (sprite.body.blocked.left || sprite.body.blocked.right) {
-      sprite.setVelocityX(sprite.body.velocity.x * -1);
+    if (sprite.x <= 0 + sprite.width / 2) {
+      sprite.x = sprite.width / 2; // Reposition within bounds
+      sprite.setVelocityX(Math.abs(sprite.body.velocity.x)); // Ensure positive velocity
+    } else if (sprite.x >= screenWidth - sprite.width / 2) {
+      sprite.x = screenWidth - sprite.width / 2; // Reposition within bounds
+      sprite.setVelocityX(-Math.abs(sprite.body.velocity.x)); // Ensure negative velocity
     }
   });
 }

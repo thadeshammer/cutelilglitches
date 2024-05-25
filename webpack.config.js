@@ -21,6 +21,12 @@ module.exports = {
       },
     ],
   },
+  cache: {
+    type: "filesystem",
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
   resolve: {
     alias: {
       phaser: path.resolve(__dirname, "node_modules/phaser/dist/phaser.js"),
