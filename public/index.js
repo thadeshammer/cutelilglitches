@@ -1,5 +1,3 @@
-import Phaser from "phaser";
-
 /**
  * @type {Phaser.Types.Core.GameConfig}
  */
