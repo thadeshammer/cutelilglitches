@@ -27,6 +27,7 @@
     "helmet": "^7.1.0",
     "passport": "^0.7.0",
     "passport-twitch": "^1.0.3",
+    "passport-twitch-new": "^0.0.3",
     "phaser": "^3.80.1"
   }
 }

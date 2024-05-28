@@ -1,24 +1,25 @@
+// TODO "File is a CommonJS module; it may be converted to an ES module."
 const express = require("express");
 const path = require("path");
 const passport = require("passport");
-const TwitchStrategy = require("passport-twitch").Strategy;
+const TwitchStrategy = require("passport-twitch-new").Strategy;
 const session = require("express-session");
 const crypto = require("crypto");
 const helmet = require("helmet");
 
 const app = express();
 const PORT = 3000;
-const HOST = process.env.HOST || "0.0.0.0";
+const HOST = "localhost";
 
 const TWITCH_CLIENT_ID = "hc6bmm49z0zc0hx4tcud4oz1cgpbld";
 const TWITCH_CLIENT_SECRET = "dsaoduprxlfdpflihyga30k6ez77kk";
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
-// Configure Helmet
 app.use(helmet());
 
 // Adjust CSP settings to allow Twitch
+// blob: was necessary for phaser image loading once it was moved to public/lib
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -67,6 +68,7 @@ passport.use(
     function (accessToken, refreshToken, profile, done) {
       // In a real application, you would save the user information in a database
       // For this example, we are just passing the profile information
+      // TODO I should probably do this so the user doesn't have to login every app restart.
       return done(null, profile);
     }
   )
@@ -80,12 +82,6 @@ passport.serializeUser(function (user, done) {
 // Deserialize user information from the session
 passport.deserializeUser(function (obj, done) {
   done(null, obj);
-});
-
-// Handle favicon requests
-app.get("/favicon.ico", (req, res) => {
-  console.log("Favicon requested");
-  res.status(204).send();
 });
 
 // Serve static files from the 'public' directory
@@ -114,7 +110,7 @@ app.get(
     next();
   },
   passport.authenticate("twitch", { failureRedirect: "/" }),
-  function (req, res) {
+  (req, res) => {
     // Successful authentication, redirect home.
     res.redirect("/");
   }
