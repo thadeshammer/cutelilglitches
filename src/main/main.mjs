@@ -16,7 +16,7 @@ import {
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET,
 } from "../common/twitch_oauth.mjs";
-import { fetchViewerList } from "../common/twitch_util.mjs";
+import { setupRoutes } from "./routes.mjs";
 
 dotenv.config();
 
@@ -25,7 +25,6 @@ const projectRoot = path.resolve(moduleDirectory, "../../");
 
 const PORT = 3000;
 const HOST = "localhost";
-
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
@@ -64,7 +63,7 @@ serverApp.use(
     saveUninitialized: true,
     cookie: {
       sameSite: "Lax",
-      secure: false, // Ensure this is set to true if you are using HTTPS
+      secure: false,
     },
   })
 );
@@ -84,107 +83,26 @@ passport.use(
     },
     function (accessToken, refreshToken, profile, done) {
       logger.info(`Twitch profile: ${JSON.stringify(profile)}`);
-      // In a real application, you would save the user information in a database
+      // Should probably save the user information so we don't have to re-auth every time.
       return done(null, profile);
     }
   )
 );
 
-// Serialize user information into the session
 passport.serializeUser(function (user, done) {
-  logger.info(`Serializing user: ${JSON.stringify(user)}`);
+  logger.debug(`Serializing user: ${JSON.stringify(user)}`);
   done(null, user);
 });
 
-// Deserialize user information from the session
 passport.deserializeUser(function (obj, done) {
-  logger.info(`Deserializing user: ${JSON.stringify(obj)}`);
+  logger.debug(`Deserializing user: ${JSON.stringify(obj)}`);
   done(null, obj);
 });
 
-// Serve static files from the 'public' directory
+// Serve static files from the '/public' directory
 serverApp.use(express.static(path.join(projectRoot, "public")));
 
-// Define debug route for testing
-serverApp.get("/test", (req, res) => {
-  logger.debug("Test route accessed");
-  res.send("Test route working");
-});
-
-// Define routes
-serverApp.get(
-  "/auth/twitch",
-  (req, res, next) => {
-    logger.debug("Twitch auth route accessed");
-    next();
-  },
-  passport.authenticate("twitch")
-);
-
-serverApp.get(
-  "/auth/twitch/callback",
-  (req, res, next) => {
-    logger.debug("Twitch callback route accessed");
-    next();
-  },
-  passport.authenticate("twitch", { failureRedirect: "/" }),
-  (req, res) => {
-    logger.debug("Successful auth to twitch, redirecting home.");
-    // Successful authentication, redirect home.
-    res.redirect("/");
-  }
-);
-
-serverApp.get("/logout", (req, res) => {
-  logger.debug("Logout route accessed");
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/");
-  });
-});
-
-serverApp.get("/profile", (req, res) => {
-  logger.debug("Profile route accessed");
-  if (!req.isAuthenticated()) {
-    logger.warn("Twitch user is not authenticated");
-    return res.status(401).send("You are not authenticated");
-  }
-  res.json(req.user);
-});
-
-serverApp.get("/channelid", (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).send("You are not authenticated");
-  }
-  const profile = req.user;
-  const channelId = profile.id; // Twitch channel ID
-  res.json({ channelId });
-});
-
-serverApp.get("/viewers", async (req, res) => {
-  logger.debug("Handing /viewers request");
-  if (!req.isAuthenticated()) {
-    logger.log("User is not authenticated");
-    return res.status(401).send("You are not authenticated");
-  }
-
-  try {
-    logger.info(`Fetching viewer list for ${req.user.id}`);
-    const viewerList = await fetchViewerList(req.user.id);
-    res.json(viewerList);
-  } catch (error) {
-    logger.error("Error fetching viewer list:", error);
-    res.status(500).send(error.message);
-  }
-});
-
-// Send the main HTML file when accessing the root URL
-serverApp.get("/", (req, res) => {
-  logger.debug("Root route accessed");
-  res.sendFile(path.join(moduleDirectory, "public", "index.html"));
-});
+setupRoutes(serverApp, passport);
 
 // Start the server
 serverApp.listen(PORT, HOST, () => {
