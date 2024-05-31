@@ -26,6 +26,10 @@ const HOST = "localhost";
 // dig into those docs.
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) {
+  throw new Error("Missing Twitch client ID or client secret.");
+}
+
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
@@ -63,8 +67,8 @@ serverApp.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      sameSite: "None",
-      secure: true, // Ensure this is set to true if you are using HTTPS
+      sameSite: "Lax",
+      secure: false, // Ensure this is set to true if you are using HTTPS
     },
   })
 );
@@ -83,6 +87,7 @@ passport.use(
       scope: "user_read",
     },
     function (accessToken, refreshToken, profile, done) {
+      logger.info(`Twitch profile: ${JSON.stringify(profile)}`);
       // In a real application, you would save the user information in a database
       return done(null, profile);
     }
@@ -91,11 +96,13 @@ passport.use(
 
 // Serialize user information into the session
 passport.serializeUser(function (user, done) {
+  logger.info(`Serializing user: ${JSON.stringify(user)}`);
   done(null, user);
 });
 
 // Deserialize user information from the session
 passport.deserializeUser(function (obj, done) {
+  logger.info(`Deserializing user: ${JSON.stringify(obj)}`);
   done(null, obj);
 });
 
@@ -126,6 +133,7 @@ serverApp.get(
   },
   passport.authenticate("twitch", { failureRedirect: "/" }),
   (req, res) => {
+    logger.debug("Successful auth to twitch, redirecting home.");
     // Successful authentication, redirect home.
     res.redirect("/");
   }
@@ -133,13 +141,18 @@ serverApp.get(
 
 serverApp.get("/logout", (req, res) => {
   logger.debug("Logout route accessed");
-  req.logout();
-  res.redirect("/");
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
 });
 
 serverApp.get("/profile", (req, res) => {
   logger.debug("Profile route accessed");
   if (!req.isAuthenticated()) {
+    logger.warn("Twitch user is not authenticated");
     return res.status(401).send("You are not authenticated");
   }
   res.json(req.user);
