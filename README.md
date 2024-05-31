@@ -66,8 +66,8 @@ bottom of the window. Stay tuned for more than that.
 
 ## Licenses
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file
-for details.
+This project (excluding the art) is licensed under the GNU General Public License v3.0. See the
+[LICENSE](LICENSE) file for details.
 
 ### Commissioned Art
 
