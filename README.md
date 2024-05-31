@@ -11,6 +11,15 @@ GOALS.
 - Make this open source but to also distribute an installer built with Electron for
   folks who aren't tech savy.
 
+## Known Issues
+
+| Issue Description                           | Status       |
+| ------------------------------------------- | ------------ |
+| Twitch Auth works but doesn't persist       | ❌           |
+| Twith viewer list load contingent upon auth | ✅           |
+| Phaser WebGL warnings in Firefox            | ✅ (wontfix) |
+| Unit tests                                  | ❌           |
+
 ## Features
 
 - **Electron**: Cross-platform desktop applications with JavaScript, HTML, and CSS.
@@ -24,14 +33,6 @@ GOALS.
   your app from well-known web vulnerabilities.
 
 ## Getting Started
-
-### Prerequisites
-
-Make sure you have the following installed on your development machine:
-
-- [Node.js](https://nodejs.org/) (version 14.x or later)
-- [npm](https://www.npmjs.com/) (Node package manager)
-- [Git](https://git-scm.com/)
 
 ### Installation
 
@@ -62,7 +63,3 @@ Make sure you have the following installed on your development machine:
 To start it up, use `npm start`. Functionality is extremely limited at the time of writing, I'm
 very early development. All it does is move ten flowers around at random velocities along the
 bottom of the window. Stay tuned for more than that.
-
-Currently this is built for Windows and only tested there. (It turns out the WSL environment
-isn't great for X server stuff and Electron HATES it.) I do have Mac hardware I can eventually
-test this on.
