@@ -118,6 +118,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    icon: path.join(projectRoot, "public/favicon.ico"),
   });
 
   mainWindow.loadURL(`http://${HOST}:${PORT}`); // Load the URL served by the server
@@ -126,6 +127,7 @@ function createWindow() {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
+  logger.info("Shutting down.");
   if (process.platform !== "darwin") {
     app.quit();
   }

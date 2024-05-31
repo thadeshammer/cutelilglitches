@@ -63,3 +63,42 @@ GOALS.
 To start it up, use `npm start`. Functionality is extremely limited at the time of writing, I'm
 very early development. All it does is move ten flowers around at random velocities along the
 bottom of the window. Stay tuned for more than that.
+
+## Licenses
+
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file
+for details.
+
+### Commissioned Art
+
+Some art assets in this project are © [Mouse Draws], used with permission. All rights are controlled
+by the project owner.
+
+### Pixel Art License
+
+The pixel art assets included in this project under the /public/assets folder are created by me
+(I'm so sorry) and are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International (CC BY-NC-SA 4.0) license.
+
+You are free to:
+
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material
+
+Under the following terms:
+
+- Attribution — You must give appropriate credit, provide a link to the license, and indicate if
+  changes were made. You may do so in any reasonable manner, but not in any way that suggests the
+  licensor endorses you or your use.
+- NonCommercial — You may not use the material for commercial purposes.
+- ShareAlike — If you remix, transform, or build upon the material, you must distribute your
+  contributions under the same license as the original.
+
+Full License Text: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
+
+See the [PIXEL_ART_LICENSE](PIXEL_ART_LICENSE) file for details.
+
+### Usage by the Author
+
+As the original creator, I retain all rights to use, modify, and distribute my work, including for
+commercial purposes.
