@@ -71,7 +71,7 @@ This project (excluding the art) is licensed under the GNU General Public Licens
 
 ### Commissioned Art
 
-Some art assets in this project are © [Mouse Draws]https://mousedraws.carrd.co/(), used with
+Some art assets in this project are © [Mouse Draws](https://mousedraws.carrd.co/), used with
 permission. All rights are controlled by the project owner.
 
 ### Pixel Art License
