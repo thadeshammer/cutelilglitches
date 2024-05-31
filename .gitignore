@@ -23,5 +23,5 @@ Thumbs.db
 .vscode/
 
 # Ingore env and secrets
-.env
+.env*
 secrets.json
