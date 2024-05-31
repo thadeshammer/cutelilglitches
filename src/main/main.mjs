@@ -8,11 +8,12 @@ import { Strategy as TwitchStrategy } from "passport-twitch-new";
 import session from "express-session";
 import crypto from "crypto";
 import helmet from "helmet";
-import winston from "winston";
-import { format } from "logform";
 import fs from "fs";
 
+import { logger, loggingDirectory } from "../common/logger.mjs";
+
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(moduleDirectory, "../../");
 
 const PORT = 3000;
 const HOST = "localhost";
@@ -25,58 +26,7 @@ const TWITCH_CLIENT_SECRET = "dsaoduprxlfdpflihyga30k6ez77kk";
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
-// Configure Winston logger
-// logs will land in user's app data directory
-const logDir = path.join(app.getPath("userData"), "logs");
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
-}
-
-const alignedWithColorsAndTime = format.combine(
-  format.colorize(),
-  format.timestamp(),
-  format.align(),
-  format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
-);
-
-const logger = winston.createLogger({
-  level: "debug",
-  format: alignedWithColorsAndTime,
-  transports: [
-    new winston.transports.File({
-      filename: path.join(logDir, "error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, "combined.log"),
-    }),
-  ],
-});
-
-// If we're not in production, log to console as well.
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.json(),
-    })
-  );
-}
-
-// Override console methods for imported libs like Phaser.
-console.log = (...args) => {
-  logger.info(args.join(" "));
-};
-console.error = (...args) => {
-  logger.error(args.join(" "));
-};
-console.warn = (...args) => {
-  logger.warn(args.join(" "));
-};
-console.info = (...args) => {
-  logger.info(args.join(" "));
-};
-
-logger.info(`Logger ready. Logs are in ${logDir}`);
+logger.info(`Logger ready. Logs are in ${loggingDirectory}`);
 
 // Create the Express app
 const serverApp = express();
@@ -147,7 +97,7 @@ passport.deserializeUser(function (obj, done) {
 });
 
 // Serve static files from the 'public' directory
-serverApp.use(express.static(path.join(moduleDirectory, "public")));
+serverApp.use(express.static(path.join(projectRoot, "public")));
 
 // Define debug route for testing
 serverApp.get("/test", (req, res) => {

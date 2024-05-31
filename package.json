@@ -1,8 +1,8 @@
 {
-  "name": "secrets",
+  "name": "cute-lil-glitches",
   "type": "module",
   "version": "1.0.0",
-  "main": "main.mjs",
+  "main": "src/main/main.mjs",
   "scripts": {
     "format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -32,6 +32,7 @@
     "helm": "^0.2.1",
     "helmet": "^7.1.0",
     "logform": "^2.6.0",
+    "moment-timezone": "^0.5.45",
     "passport": "^0.7.0",
     "passport-twitch": "^1.0.3",
     "passport-twitch-new": "^0.0.3",
