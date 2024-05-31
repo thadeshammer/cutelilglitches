@@ -21,3 +21,7 @@ Thumbs.db
 
 # Ignore IDE-specific files
 .vscode/
+
+# Ingore env and secrets
+.env
+secrets.json

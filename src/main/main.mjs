@@ -9,8 +9,11 @@ import session from "express-session";
 import crypto from "crypto";
 import helmet from "helmet";
 import fs from "fs";
+import dotenv from "dotenv";
 
 import { logger, loggingDirectory } from "../common/logger.mjs";
+
+dotenv.config();
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(moduleDirectory, "../../");
@@ -21,8 +24,8 @@ const HOST = "localhost";
 // NOTE My understanding is that I'll eventually run a tiny servlet/lambda that this app will use
 // on end-user systems to auth with Twitch. Apparation provided me with sample code and I need to
 // dig into those docs.
-const TWITCH_CLIENT_ID = "hc6bmm49z0zc0hx4tcud4oz1cgpbld";
-const TWITCH_CLIENT_SECRET = "dsaoduprxlfdpflihyga30k6ez77kk";
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
