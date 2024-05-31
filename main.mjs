@@ -1,19 +1,25 @@
 // Electron housing
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
-const express = require("express");
-const passport = require("passport");
-const TwitchStrategy = require("passport-twitch-new").Strategy;
-const session = require("express-session");
-const crypto = require("crypto");
-const helmet = require("helmet");
-const winston = require("winston");
-const { format } = require("logform");
-const fs = require("fs");
+import { app, BrowserWindow } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
+import express from "express";
+import passport from "passport";
+import { Strategy as TwitchStrategy } from "passport-twitch-new";
+import session from "express-session";
+import crypto from "crypto";
+import helmet from "helmet";
+import winston from "winston";
+import { format } from "logform";
+import fs from "fs";
+
+const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = 3000;
 const HOST = "localhost";
 
+// NOTE My understanding is that I'll eventually run a tiny servlet/lambda that this app will use
+// on end-user systems to auth with Twitch. Apparation provided me with sample code and I need to
+// dig into those docs.
 const TWITCH_CLIENT_ID = "hc6bmm49z0zc0hx4tcud4oz1cgpbld";
 const TWITCH_CLIENT_SECRET = "dsaoduprxlfdpflihyga30k6ez77kk";
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
@@ -70,8 +76,7 @@ console.info = (...args) => {
   logger.info(args.join(" "));
 };
 
-logger.info("Logger ready.");
-console.log(`Logger ready. See file at ${logDir}`);
+logger.info(`Logger ready. Logs are in ${logDir}`);
 
 // Create the Express app
 const serverApp = express();
@@ -142,11 +147,11 @@ passport.deserializeUser(function (obj, done) {
 });
 
 // Serve static files from the 'public' directory
-serverApp.use(express.static(path.join(__dirname, "public")));
+serverApp.use(express.static(path.join(moduleDirectory, "public")));
 
 // Define debug route for testing
 serverApp.get("/test", (req, res) => {
-  logger.log({ level: "debug", message: "Test route accessed" });
+  logger.debug("Test route accessed");
   res.send("Test route working");
 });
 
@@ -154,7 +159,7 @@ serverApp.get("/test", (req, res) => {
 serverApp.get(
   "/auth/twitch",
   (req, res, next) => {
-    logger.log({ level: "debug", message: "Twitch auth route accessed" });
+    logger.debug("Twitch auth route accessed");
     next();
   },
   passport.authenticate("twitch")
@@ -163,7 +168,7 @@ serverApp.get(
 serverApp.get(
   "/auth/twitch/callback",
   (req, res, next) => {
-    logger.log({ level: "debug", message: "Twitch callback route accessed" });
+    logger.debug("Twitch callback route accessed");
     next();
   },
   passport.authenticate("twitch", { failureRedirect: "/" }),
@@ -174,13 +179,13 @@ serverApp.get(
 );
 
 serverApp.get("/logout", (req, res) => {
-  logger.log({ level: "debug", message: "Logout route accessed" });
+  logger.debug("Logout route accessed");
   req.logout();
   res.redirect("/");
 });
 
 serverApp.get("/profile", (req, res) => {
-  logger.log({ level: "debug", message: "Profile route accessed" });
+  logger.debug("Profile route accessed");
   if (!req.isAuthenticated()) {
     return res.status(401).send("You are not authenticated");
   }
@@ -189,16 +194,13 @@ serverApp.get("/profile", (req, res) => {
 
 // Send the main HTML file when accessing the root URL
 serverApp.get("/", (req, res) => {
-  logger.log({ level: "debug", message: "Root route accessed" });
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  logger.debug("Root route accessed");
+  res.sendFile(path.join(moduleDirectory, "public", "index.html"));
 });
 
 // Start the server
 serverApp.listen(PORT, HOST, () => {
-  logger.log({
-    level: "debug",
-    message: `Server is running at http://${HOST}:${PORT}`,
-  });
+  logger.info(`Server is running at http://${HOST}:${PORT}`);
 });
 
 function createWindow() {
@@ -206,7 +208,7 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(moduleDirectory, "preload.mjs"),
       nodeIntegration: true,
       contextIsolation: false,
     },
