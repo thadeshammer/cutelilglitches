@@ -1,9 +1,10 @@
-import path from "path";
-import { app } from "electron";
-import winston from "winston";
-import { format } from "logform";
 import fs from "fs";
+import path from "path";
 import moment from "moment-timezone";
+
+import { app } from "electron";
+import { format } from "logform";
+import winston from "winston";
 
 // Ensure the log directory exists
 const loggingDirectory = path.join(app.getPath("userData"), "logs");

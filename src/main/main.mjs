@@ -1,17 +1,22 @@
 // Electron housing
-import { app, BrowserWindow } from "electron";
+import crypto from "crypto";
+import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import { app, BrowserWindow } from "electron";
 import express from "express";
+import session from "express-session";
+import helmet from "helmet";
 import passport from "passport";
 import { Strategy as TwitchStrategy } from "passport-twitch-new";
-import session from "express-session";
-import crypto from "crypto";
-import helmet from "helmet";
-import fs from "fs";
-import dotenv from "dotenv";
 
 import { logger, loggingDirectory } from "../common/logger.mjs";
+import {
+  TWITCH_CLIENT_ID,
+  TWITCH_CLIENT_SECRET,
+} from "../common/twitch_oauth.mjs";
+import { fetchViewerList } from "../common/twitch_util.mjs";
 
 dotenv.config();
 
@@ -20,15 +25,6 @@ const projectRoot = path.resolve(moduleDirectory, "../../");
 
 const PORT = 3000;
 const HOST = "localhost";
-
-// NOTE My understanding is that I'll eventually run a tiny servlet/lambda that this app will use
-// on end-user systems to auth with Twitch. Apparation provided me with sample code and I need to
-// dig into those docs.
-const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
-const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
-if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) {
-  throw new Error("Missing Twitch client ID or client secret.");
-}
 
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
@@ -156,6 +152,32 @@ serverApp.get("/profile", (req, res) => {
     return res.status(401).send("You are not authenticated");
   }
   res.json(req.user);
+});
+
+serverApp.get("/channelid", (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).send("You are not authenticated");
+  }
+  const profile = req.user;
+  const channelId = profile.id; // Twitch channel ID
+  res.json({ channelId });
+});
+
+serverApp.get("/viewers", async (req, res) => {
+  logger.debug("Handing /viewers request");
+  if (!req.isAuthenticated()) {
+    logger.log("User is not authenticated");
+    return res.status(401).send("You are not authenticated");
+  }
+
+  try {
+    logger.info(`Fetching viewer list for ${req.user.id}`);
+    const viewerList = await fetchViewerList(req.user.id);
+    res.json(viewerList);
+  } catch (error) {
+    logger.error("Error fetching viewer list:", error);
+    res.status(500).send(error.message);
+  }
 });
 
 // Send the main HTML file when accessing the root URL
