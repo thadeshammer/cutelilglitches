@@ -62,3 +62,7 @@ Make sure you have the following installed on your development machine:
 To start it up, use `npm start`. Functionality is extremely limited at the time of writing, I'm
 very early development. All it does is move ten flowers around at random velocities along the
 bottom of the window. Stay tuned for more than that.
+
+Currently this is built for Windows and only tested there. (It turns out the WSL environment
+isn't great for X server stuff and Electron HATES it.) I do have Mac hardware I can eventually
+test this on.
