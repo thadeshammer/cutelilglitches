@@ -41,8 +41,8 @@ GOALS.
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/yourusername/cutelilglitches.git
+   cd cutelilglitches
    ```
 
 2. **Install Dependencies**
