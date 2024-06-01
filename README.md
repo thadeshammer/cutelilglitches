@@ -19,6 +19,7 @@ GOALS.
 | Twith viewer list load contingent upon auth | ✅           |
 | Phaser WebGL warnings in Firefox            | ✅ (wontfix) |
 | Unit tests                                  | ❌           |
+| Twitch OAuth sans client secret in .env     | ❌           |
 
 ## Features
 
