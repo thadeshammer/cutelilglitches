@@ -15,7 +15,7 @@ GOALS.
 
 | Issue Description                           | Status       |
 | ------------------------------------------- | ------------ |
-| Twitch Auth works but doesn't persist       | ❌           |
+| Twitch Auth works but doesn't persist       | ✅           |
 | Twith viewer list load contingent upon auth | ✅           |
 | Phaser WebGL warnings in Firefox            | ✅ (wontfix) |
 | Unit tests                                  | ❌           |
