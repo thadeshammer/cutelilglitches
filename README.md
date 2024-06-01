@@ -20,6 +20,7 @@ GOALS.
 | Phaser WebGL warnings in Firefox            | ✅ (wontfix) |
 | Unit tests                                  | ❌           |
 | Twitch OAuth sans client secret in .env     | ❌           |
+| Animations beyond just wandering            | ❌           |
 
 ## Features
 
