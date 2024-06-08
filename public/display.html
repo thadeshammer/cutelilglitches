@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Display URL</title>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log(window.config); // Debugging log
+        const host = window.config.host;
+        const port = window.config.port;
+        const url = `http://${host}:${port}`;
+        document.getElementById("server-url").innerText = url;
+        document.getElementById("server-link").href = url;
+        document.getElementById("server-link").innerText = url;
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Server is running at:</h1>
+    <p id="server-url"></p>
+  </body>
+</html>

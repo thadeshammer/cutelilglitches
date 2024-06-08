@@ -17,14 +17,12 @@ import {
   TWITCH_CLIENT_SECRET,
 } from "../common/twitch_oauth.mjs";
 import { setupRoutes } from "./routes.mjs";
+import { HOST, PORT } from "./config.mjs";
 
 dotenv.config();
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(moduleDirectory, "../../");
-
-const PORT = 3000;
-const HOST = "localhost";
 const SESSION_SECRET = crypto.randomBytes(64).toString("hex");
 const CALLBACK_URL = `http://${HOST}:${PORT}/auth/twitch/callback`;
 
@@ -109,32 +107,29 @@ serverApp.listen(PORT, HOST, () => {
   logger.info(`Server is running at http://${HOST}:${PORT}`);
 });
 
+let mainWindow;
+
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(moduleDirectory, "preload.mjs"),
+      preload: path.join(moduleDirectory, "../renderer/preload.mjs"),
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true, // TODO what is this? I seem to need it
     },
     icon: path.join(projectRoot, "public/favicon.ico"),
   });
 
-  mainWindow.loadURL(`http://${HOST}:${PORT}`); // Load the URL served by the server
+  mainWindow.loadFile(path.join(projectRoot, "public", "display.html"));
+
+  mainWindow.on("closed", function () {
+    app.quit();
+  });
 }
 
 app.on("ready", createWindow);
 
-app.on("window-all-closed", () => {
-  logger.info("Shutting down.");
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+app.on("window-all-closed", function () {
+  app.quit();
 });

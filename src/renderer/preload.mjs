@@ -1,11 +1,7 @@
-// Expose Node.js APIs to renderer process if required.
-window.addEventListener("DOMContentLoaded", () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector);
-    if (element) element.innerText = text;
-  };
+import { contextBridge } from "electron";
+import { HOST, PORT } from "../main/config.mjs";
 
-  for (const dependency of ["chrome", "node", "electron"]) {
-    replaceText(`${dependency}-version`, process.versions[dependency]);
-  }
+contextBridge.exposeInMainWorld("config", {
+  host: HOST,
+  port: PORT,
 });
