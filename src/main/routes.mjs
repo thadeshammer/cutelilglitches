@@ -1,7 +1,9 @@
-import { access } from "original-fs";
+import path from "path";
 import { logger } from "../common/logger.mjs";
-
 import { initializeTwitchChat, viewers } from "../common/twitch_chat.mjs";
+import { fileURLToPath } from "url";
+
+const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 function ensureAuthenticated(req, res, next) {
   /* Stores the protected URL, redirects to auth, then back to that stored URL.
@@ -21,10 +23,17 @@ function ensureAuthenticated(req, res, next) {
 
 function setupRoutes(serverApp, passport) {
   /*
+      Log all incoming requests
+  */
+  serverApp.use((req, res, next) => {
+    logger.debug(`Incoming request: ${req.method} ${req.url}`);
+    next();
+  });
+
+  /*
       Unprotected routes
   */
   serverApp.get("/", (req, res) => {
-    // This right here is the browser source target.
     logger.debug("Root route accessed");
     res.sendFile(path.join(moduleDirectory, "public", "index.html"));
   });
@@ -41,7 +50,7 @@ function setupRoutes(serverApp, passport) {
     "/auth/twitch",
     (req, res, next) => {
       logger.debug(
-        `Twitch auth route accessed, should return to ${req.returnTo}`
+        `Twitch auth route accessed, should return to ${req.session.returnTo}`
       );
       next();
     },
@@ -87,7 +96,6 @@ function setupRoutes(serverApp, passport) {
   /*
       Protected routes
   */
-
   serverApp.get("/profile", ensureAuthenticated, (req, res) => {
     logger.debug("Profile route accessed");
     if (!req.isAuthenticated()) {

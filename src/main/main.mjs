@@ -53,6 +53,15 @@ serverApp.use(
   })
 );
 
+// Serve static files from the '/public' directory
+serverApp.use(express.static(path.join(projectRoot, "public")));
+
+// Log all requests for debugging
+serverApp.use((req, res, next) => {
+  logger.debug(`Request URL: ${req.url}`);
+  next();
+});
+
 // Configure session middleware
 serverApp.use(
   session({
@@ -96,9 +105,6 @@ passport.deserializeUser(function (obj, done) {
   logger.debug(`Deserializing user: ${JSON.stringify(obj)}`);
   done(null, obj);
 });
-
-// Serve static files from the '/public' directory
-serverApp.use(express.static(path.join(projectRoot, "public")));
 
 setupRoutes(serverApp, passport);
 
