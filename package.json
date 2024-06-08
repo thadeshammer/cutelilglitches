@@ -64,6 +64,7 @@
     "passport-twitch": "^1.0.3",
     "passport-twitch-new": "^0.0.3",
     "phaser": "^3.80.1",
+    "tmi.js": "^1.8.5",
     "winston": "^3.13.0"
   },
   "engines": {

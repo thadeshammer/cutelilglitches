@@ -1,5 +1,7 @@
-import { fetchViewerList } from "../common/twitch_util.mjs";
+import { access } from "original-fs";
 import { logger } from "../common/logger.mjs";
+
+import { initializeTwitchChat, viewers } from "../common/twitch_chat.mjs";
 
 function ensureAuthenticated(req, res, next) {
   /* Stores the protected URL, redirects to auth, then back to that stored URL.
@@ -56,10 +58,19 @@ function setupRoutes(serverApp, passport) {
       keepSessionInfo: true,
       failureRedirect: "/",
     }),
-    (req, res) => {
-      const returnTo = req.session.returnTo;
-      logger.debug(`Successful auth to twitch, redirecting to ${returnTo}`);
-      res.redirect(returnTo);
+    async (req, res) => {
+      const returnTo = req.session.returnTo || "/";
+      try {
+        const { login, accessToken } = req.user;
+        console.log("trying to login chat with channelname: ", login);
+        await initializeTwitchChat(login, accessToken);
+
+        logger.debug(`Successful auth to twitch, redirecting to ${returnTo}`);
+        res.redirect(returnTo);
+      } catch (error) {
+        logger.error(`Error initializing Twitch chat: ${error}`);
+        res.redirect(returnTo);
+      }
     }
   );
 
@@ -93,23 +104,6 @@ function setupRoutes(serverApp, passport) {
     const profile = req.user;
     const channelId = profile.id; // Twitch channel ID
     res.json({ channelId });
-  });
-
-  serverApp.get("/viewers", ensureAuthenticated, async (req, res) => {
-    logger.debug("Handing /viewers request");
-    if (!req.isAuthenticated()) {
-      logger.log("User is not authenticated");
-      return res.status(401).send("You are not authenticated");
-    }
-
-    try {
-      logger.info(`Fetching viewer list for ${req.user.id}`);
-      const viewerList = await fetchViewerList(req.user.id);
-      res.json(viewerList);
-    } catch (error) {
-      logger.error("Error fetching viewer list:", error);
-      res.status(500).send(error.message);
-    }
   });
 }
 

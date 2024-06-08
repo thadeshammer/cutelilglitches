@@ -25,6 +25,7 @@ async function fetchTwitchOAuthToken() {
       client_id: TWITCH_CLIENT_ID,
       client_secret: TWITCH_CLIENT_SECRET,
       grant_type: "client_credentials",
+      scope: "chat:read chat:edit channel:read:subscriptions",
     }),
   });
 

@@ -77,11 +77,11 @@ passport.use(
       clientID: TWITCH_CLIENT_ID,
       clientSecret: TWITCH_CLIENT_SECRET,
       callbackURL: CALLBACK_URL,
-      scope: "user_read",
+      scope: "user_read chat:read chat:edit channel:read:subscriptions",
     },
     function (accessToken, refreshToken, profile, done) {
       logger.info(`Twitch profile: ${JSON.stringify(profile)}`);
-      // Should probably save the user information so we don't have to re-auth every time.
+      profile.accessToken = accessToken; // Store accessToken in the profile
       return done(null, profile);
     }
   )
@@ -128,7 +128,9 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+});
 
 app.on("window-all-closed", function () {
   app.quit();
