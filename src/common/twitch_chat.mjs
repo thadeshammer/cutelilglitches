@@ -1,61 +1,75 @@
 import tmi from "tmi.js";
-import { getTwitchOAuthToken } from "./twitch_oauth.mjs"; // Adjust the path as needed
+
+import { logger } from "../common/logger.mjs";
 
 let viewers = new Set();
+let chatters = new Set();
+let client;
 
 async function initializeTwitchChat(channelName, accessToken) {
-  try {
-    console.log(`Connecting to Twitch chat with username: ${channelName}.`);
+  /*
+    https://github.com/tmijs/tmi.js
 
-    const client = new tmi.Client({
-      options: { debug: true },
-      connection: {
-        reconnect: true,
-        secure: true,
-      },
-      identity: {
-        username: channelName,
-        password: `oauth:${accessToken}`,
-      },
-      channels: [channelName],
-    });
+    This hasn't been updated in two years but is still working; I have mixed feelings about that.
+  */
+  if (!client) {
+    try {
+      logger.debug(`Connecting to Twitch chat with username: ${channelName}.`);
 
-    await client.connect().catch((err) => {
-      console.error("Error connecting to Twitch chat:", err);
-    });
+      client = new tmi.Client({
+        options: { debug: false }, // Set to true for additional logging if chat gets weird
+        connection: {
+          reconnect: true,
+          secure: true,
+        },
+        identity: {
+          username: channelName,
+          password: `oauth:${accessToken}`,
+        },
+        channels: [channelName],
+      });
 
-    client.on("join", (channel, username, self) => {
-      if (!self) {
-        viewers.add(username);
-        console.log(`${username} joined the chat`);
-      }
-    });
+      await client.connect().catch((err) => {
+        console.error("Error connecting to Twitch chat:", err);
+      });
 
-    client.on("part", (channel, username, self) => {
-      if (!self) {
-        viewers.delete(username);
-        console.log(`${username} left the chat`);
-      }
-    });
+      client.on("join", (channel, username, self) => {
+        if (!self) {
+          viewers.add(username);
+          logger.debug(`${username} joined the chat`);
+        }
+      });
 
-    client.on("chat", (channel, userstate, message, self) => {
-      if (self) return;
-      console.log(`[${userstate.username}] ${message}`);
-    });
+      client.on("part", (channel, username, self) => {
+        if (!self) {
+          viewers.delete(username);
+          logger.debug(`${username} left the chat`);
+        }
+      });
 
-    client.on("connected", (address, port) => {
-      console.log(`Connected to ${address}:${port}`);
-    });
+      client.on("chat", (channel, userstate, message, self) => {
+        if (!self) {
+          chatters.add(userstate.username);
+          logger.debug(`[${userstate.username}] ${message}`);
+        }
+      });
 
-    client.on("disconnected", (reason) => {
-      console.log(`Disconnected: ${reason}`);
-    });
+      client.on("connected", (address, port) => {
+        logger.debug(`Connected to ${address}:${port}`);
+      });
 
-    client.on("error", (err) => {
-      console.error(`TMI Client Error: ${err.message}`);
-    });
-  } catch (error) {
-    console.error("Error initializing Twitch chat:", error);
+      client.on("disconnected", (reason) => {
+        logger.debug(`Disconnected: ${reason}`);
+      });
+
+      client.on("error", (err) => {
+        logger.error(`TMI Client Error: ${err.message}`);
+      });
+    } catch (error) {
+      logger.error("Error initializing Twitch chat:", error);
+    }
+  } else {
+    log.console.warn("Tried to init chat more than once.");
   }
 }
 

@@ -57,6 +57,7 @@
     "express-session": "^1.18.0",
     "helm": "^0.2.1",
     "helmet": "^7.1.0",
+    "js-yaml": "^4.1.0",
     "logform": "^2.6.0",
     "moment-timezone": "^0.5.45",
     "node-fetch": "^3.3.2",
